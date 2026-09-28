@@ -49,12 +49,15 @@ const AppState = {
     isPerpendicular: null
   },
 
-  // 選單 4：複合圖形的面積狀態
+  // 選單 4：複合圖形的面積狀態 (6道真實題目、求救多元想法、先算再算最後算三階段輸入)
   compositeArea: {
-    activeMethod: 'split', // 'split' (分割再加總), 'subtract' (補完再刪去), 'translate' (平移再合併)
-    problemIndex: 0, // 當前心法下的範例索引 (0: 範例一, 1: 範例二)
-    step: 0, // 0: 原複合圖形, 1: 變形/輔助線展開
-    practiceAnswer: null,
+    currentProbIdx: 0, // 0 ~ 5 (共 6 道題目)
+    showHelp: false,   // 是否展開求救 (查看多元解題想法)
+    stepInputs: {
+      first: '',   // 先算
+      second: '',  // 再算
+      final: ''    // 最後算
+    },
     practiceFeedback: null
   },
 
@@ -644,310 +647,177 @@ const heightMeasureDemoConfig = {
 };
 
 // --- 選單 4：複合圖形的面積 三大心法設定 (底邊對齊 y=120 格線，各心法 2 個範例) ---
-const compositeAreaConfig = {
-  split: {
-    name: "心法一：分割再加總",
-    subtitle: "化繁為簡・各個擊破",
-    desc: "將不規則的多邊形或組合圖形，用水平或鉛直的「輔助線」切割成數個我們熟悉的簡單長方形、正方形或三角形，分別算出各塊面積後再相加。",
-    problems: [
-      {
-        title: "範例一：L 形多邊形 (鉛直分割)",
-        idea1: "鉛直分割：切成「長方形 A (左)」與「長方形 B (右下)」，分別計算後相加。",
-        idea2: "水平分割：亦可沿橫向切成「上方長方形」與「下方寬長方形」，結果相同！",
-        toggleBtnText0: "✨ 展開鉛直分割線",
-        toggleBtnText1: "🔄 復原原本圖形",
-        helperTip: "💡 點選右上角<strong>「展開鉛直分割線」</strong>，觀察將 L 形切成兩個簡單長方形（長方形 A 與 B）的各個擊破思維！",
-        guidingQuestions: [
-          "這個 L 形不規則圖形，點選右上角展開分割線後，切成了哪兩個熟悉的長方形？",
-          "左邊長方形 A 的長和寬各是多少？面積該如何計算？",
-          "右邊長方形 B 的長和寬又是多少？面積又是多少？",
-          "分別算出兩塊長方形的面積後，要怎麼求出整個圖形的總面積？"
-        ],
-        strategyTip: "總面積 ＝ 長方形 A 面積 ＋ 長方形 B 面積（兩塊簡單面積相加即可求得）。",
-        question: "請觀察左圖標示的尺寸，算算看這個 L 形多邊形的總面積是多少平方公分？",
-        unit: "平方公分",
-        expectedAnswer: 96,
-        svg: (step) => `
-          <svg viewBox="0 0 280 150" class="w-full h-full max-h-64 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            ${SVG_GRID_DEFS}
-            <rect x="0" y="0" width="280" height="150" fill="url(#grid)" />
-            <g>
-              ${step === 0 ? `
-                <polygon points="40,120 160,120 160,80 120,80 120,20 40,20" fill="rgba(148, 168, 154, 0.35)" stroke="#4B5F69" stroke-width="2.5" />
-                <text x="80" y="70" font-size="14" fill="#4B5F69" font-weight="bold" text-anchor="middle">L 形圖形</text>
-              ` : `
-                <rect x="40" y="20" width="80" height="100" fill="rgba(148, 168, 154, 0.45)" stroke="#4B5F69" stroke-width="2" />
-                <rect x="120" y="80" width="40" height="40" fill="rgba(211, 162, 151, 0.45)" stroke="#B87D70" stroke-width="2" />
-                <line x1="120" y1="20" x2="120" y2="120" stroke="#C87A7A" stroke-width="2.5" stroke-dasharray="4" />
-                <text x="80" y="70" font-size="12" fill="#4B5F69" font-weight="bold" text-anchor="middle">長方形 A</text>
-                <text x="80" y="86" font-size="10" fill="#4B5F69" font-weight="bold" text-anchor="middle">(8 × 10)</text>
-                <text x="140" y="104" font-size="11" fill="#B87D70" font-weight="bold" text-anchor="middle">B (4×4)</text>
-              `}
-              <text x="32" y="74" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="end">寬 10 cm</text>
-              <text x="80" y="14" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">8 cm</text>
-              <text x="168" y="104" font-size="11" fill="#4B5F69" font-weight="bold">4 cm</text>
-              <line x1="40" y1="132" x2="160" y2="132" stroke="#4B5F69" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
-              <text x="100" y="145" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">底長 12 cm</text>
-            </g>
-          </svg>
-        `
-      },
-      {
-        title: "範例二：房屋型組合圖形 (水平分割)",
-        idea1: "水平分割：沿屋簷作水平輔助線，拆解成「上部屋頂三角形」與「下部長方形」。",
-        idea2: "對稱垂直分割：從屋頂頂點垂直切開，拆成左右兩個全等的梯形分別計算！",
-        toggleBtnText0: "✨ 展開水平分割線",
-        toggleBtnText1: "🔄 復原原本圖形",
-        helperTip: "💡 點選右上角<strong>「展開水平分割線」</strong>，觀察房屋造型拆解過程：由總高 10 cm 減去下部長方形高 6 cm，確認屋頂三角形的高為 4 cm！",
-        guidingQuestions: [
-          "點選右上角「展開水平分割線」，觀察房屋造型可以拆解成哪兩種熟悉的幾何圖形？",
-          "下部長方形的長與高是多少？上部屋頂三角形的底邊長是多少？",
-          "圖形給了「總高 10 cm」與「長方形高 6 cm」，你如何推算出上部屋頂三角形的高？",
-          "分別算出下部長方形面積與屋頂三角形面積後，總面積是多少？"
-        ],
-        strategyTip: "總面積 ＝ 下部長方形面積 ＋ 屋頂三角形面積（注意：三角形面積要除以 2 喔！）。",
-        question: "請觀察左圖標示的尺寸，算算看這個房屋形複合圖形的總面積是多少平方公分？",
-        unit: "平方公分",
-        expectedAnswer: 112,
-        svg: (step) => `
-          <svg viewBox="0 0 290 150" class="w-full h-full max-h-64 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            ${SVG_GRID_DEFS}
-            <rect x="0" y="0" width="290" height="150" fill="url(#grid)" />
-            <g>
-              ${step === 0 ? `
-                <polygon points="40,120 180,120 180,60 110,20 40,60" fill="rgba(148, 168, 154, 0.35)" stroke="#4B5F69" stroke-width="2.5" />
-                <text x="110" y="95" font-size="13" fill="#4B5F69" font-weight="bold" text-anchor="middle">複合房屋形</text>
-              ` : `
-                <rect x="40" y="60" width="140" height="60" fill="rgba(126, 144, 154, 0.4)" stroke="#4B5F69" stroke-width="2" />
-                <polygon points="40,60 110,20 180,60" fill="rgba(211, 162, 151, 0.45)" stroke="#B87D70" stroke-width="2" />
-                <line x1="40" y1="60" x2="180" y2="60" stroke="#C87A7A" stroke-width="2.5" stroke-dasharray="4" />
-                <line x1="110" y1="20" x2="110" y2="60" stroke="#C87A7A" stroke-width="1.5" stroke-dasharray="3" />
-                <rect x="110" y="52" width="8" height="8" fill="none" stroke="#C87A7A" stroke-width="1" />
-                <text x="110" y="95" font-size="13" fill="#4B5F69" font-weight="bold" text-anchor="middle">下部長方形 (14 × 6)</text>
-                <text x="118" y="44" font-size="10" fill="#B87D70" font-weight="bold">高 4 cm (10－6)</text>
-              `}
-              <text x="32" y="94" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="end">高 6 cm</text>
-              <text x="188" y="94" font-size="11" fill="#4B5F69" font-weight="bold">6 cm</text>
-              <!-- 底部長度標示 -->
-              <line x1="40" y1="132" x2="180" y2="132" stroke="#4B5F69" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
-              <text x="110" y="145" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">底長 14 cm</text>
-              <!-- 右側總高標示 (確認屋頂三角形的高為 10 - 6 = 4) -->
-              <line x1="110" y1="20" x2="225" y2="20" stroke="#7E909A" stroke-width="1" stroke-dasharray="2" />
-              <line x1="180" y1="120" x2="225" y2="120" stroke="#7E909A" stroke-width="1" stroke-dasharray="2" />
-              <line x1="215" y1="20" x2="215" y2="120" stroke="#4B5F69" stroke-width="1.5" />
-              <line x1="208" y1="20" x2="222" y2="20" stroke="#4B5F69" stroke-width="1.5" />
-              <line x1="208" y1="120" x2="222" y2="120" stroke="#4B5F69" stroke-width="1.5" />
-              <text x="228" y="74" font-size="11" fill="#4B5F69" font-weight="bold">總高 10 cm</text>
-            </g>
-          </svg>
-        `
-      }
-    ]
+// --- 選單 4：複合圖形的面積 6 道真實幾何探究題庫 ---
+const compositeProblemsData = [
+  {
+    id: 1,
+    title: "題目 1：切割合併多邊形",
+    image: "composite_shape/複合圖形1-切割合併2種解法.jpg",
+    question: "請觀察左圖標示的邊長與垂直符號，算算看複合圖形 ACDE 的總面積是多少平方公分？",
+    unit: "平方公分",
+    expectedAnswer: 297,
+    idea1: {
+      name: "想法一：沿水平線 BE 切割成三角形與梯形",
+      desc: "沿水平線 BE 切割，將圖形拆解成上方直角三角形 △ABE 與下方直角梯形 BCDE 分別計算。",
+      guidingQuestions: [
+        "沿水平線 BE 切割成三角形 △ABE 後，底邊長是多少？對應的高是多少？面積該如何計算？",
+        "沿水平線 BE 切割成梯形 BCDE 後，能找到它的上底、下底和高嗎？面積該如何計算？",
+        "分別算出兩個圖形的面積後，相加的總面積是多少？"
+      ],
+      stepsHint: "【先算】三角形 △ABE 面積 ＝ 20 × 9 ÷ 2 ＝ 90；【再算】梯形 BCDE 面積 ＝ (20 ＋ 26) × 9 ÷ 2 ＝ 46 × 9 ÷ 2 ＝ 207；【最後算】總面積 ＝ 90 ＋ 207 ＝ 297 平方公分。"
+    },
+    idea2: {
+      name: "想法二：沿斜線 EC 切割成兩個三角形",
+      desc: "沿線段 EC 切割，將圖形拆成左上方鈍角三角形 △ACE 與右下方三角形 △ECD。",
+      guidingQuestions: [
+        "沿線段 EC 切割後，左上方三角形 △ACE 如果以邊長 AC（9＋9＝18）為底，它的高是多少公分？",
+        "沿線段 EC 切割後，右下方三角形 △ECD，如果以底邊 CD（20＋6＝26）為底，對應的高是多少？",
+        "分別算出兩塊三角形面積後，相加的總面積是多少？"
+      ],
+      stepsHint: "【先算】三角形 △ACE 面積 ＝ 18 × 20 ÷ 2 ＝ 180；【再算】三角形 △ECD 面積 ＝ (20 ＋ 6) × 9 ÷ 2 ＝ 26 × 9 ÷ 2 ＝ 117；【最後算】總面積 ＝ 180 ＋ 117 ＝ 297 平方公分。"
+    }
   },
-  subtract: {
-    name: "心法二：補完再刪去",
-    subtitle: "借力使力・反向思維",
-    desc: "遇到缺角或凹進去的多邊形，想像把它補成一個完整的大長方形或正方形，算出完整面積後，再扣掉虛擬補上的空白區域面積。",
-    problems: [
-      {
-        title: "範例一：缺角大長方形 (扣除缺角)",
-        idea1: "補全扣除法：先補成完整大長方形，再扣掉虛擬補上的右上角空白缺角面積。",
-        idea2: "分割加總法：若不補全，也可以將圖形切成兩個長方形分別計算相加。",
-        toggleBtnText0: "✨ 展開補全輔助線",
-        toggleBtnText1: "🔄 復原原本圖形",
-        helperTip: "💡 點選右上角<strong>「展開補全輔助線」</strong>，觀察先虛擬補全大長方形、再扣除右上缺角的逆向思維！",
-        guidingQuestions: [
-          "點選右上角「展開補全輔助線」，若將缺角補滿，會變成一個長與寬各是多少的完整大長方形？",
-          "虛擬補上的右上角空白缺口，它的長和寬分別是多少公分？空白面積是多少？",
-          "算完完整大長方形面積後，該如何利用右上角空白面積求出實際圖形的面積？"
-        ],
-        strategyTip: "實際面積 ＝ 完整大長方形面積 － 缺口空白面積（反向思考，大塊扣除虛擬小塊）。",
-        question: "請觀察左圖標示的尺寸，算算看這個缺角多邊形的實際面積是多少平方公分？",
-        unit: "平方公分",
-        expectedAnswer: 96,
-        svg: (step) => `
-          <svg viewBox="0 0 280 150" class="w-full h-full max-h-64 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            ${SVG_GRID_DEFS}
-            <rect x="0" y="0" width="280" height="150" fill="url(#grid)" />
-            <g>
-              <polygon points="40,20 120,20 120,80 160,80 160,120 40,120" fill="rgba(148, 168, 154, 0.35)" stroke="#4B5F69" stroke-width="2.5" />
-              <text x="80" y="70" font-size="13" fill="#4B5F69" font-weight="bold" text-anchor="middle">實際圖形</text>
-              
-              ${step === 1 ? `
-                <rect x="120" y="20" width="40" height="60" fill="rgba(200, 122, 122, 0.25)" stroke="#C87A7A" stroke-width="2" stroke-dasharray="4" />
-                <text x="140" y="48" font-size="10" fill="#C87A7A" font-weight="bold" text-anchor="middle">虛擬補上</text>
-                <text x="140" y="62" font-size="9" fill="#C87A7A" font-weight="bold" text-anchor="middle">缺角 (4×6)</text>
-                <rect x="40" y="20" width="120" height="100" fill="none" stroke="#2C3539" stroke-width="1.5" stroke-dasharray="2" />
-              ` : ''}
-              
-              <text x="32" y="74" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="end">完整寬 10 cm</text>
-              <text x="100" y="14" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">完整長 12 cm</text>
-              <text x="168" y="104" font-size="11" fill="#4B5F69" font-weight="bold">4 cm</text>
-              <text x="140" y="94" font-size="10" fill="#7E909A" text-anchor="middle">4 cm</text>
-            </g>
-          </svg>
-        `
-      },
-      {
-        title: "範例二：切角多邊形 (扣除三角形角)",
-        idea1: "大長方形減小直角三角形：補齊後扣除角落三角形（先求完整，再扣除空白）。",
-        idea2: "梯形與長方形分割加總：亦可作水平分割，拆解成「上方直角梯形」與「下方長方形」。",
-        toggleBtnText0: "✨ 展開補全輔助線",
-        toggleBtnText1: "🔄 復原原本圖形",
-        helperTip: "💡 點選右上角<strong>「展開補全輔助線」</strong>，觀察將多邊形補成完整長方形、再扣除角落三角形的逆向思維！",
-        guidingQuestions: [
-          "點選右上角「展開補全輔助線」，如果把缺角補齊，完整大長方形的長和寬是多少？",
-          "右上角被切除的空白角是一個什麼形狀？它的底和高各是多少公分？",
-          "算出完整大長方形面積後，該如何扣除切除的三角形面積得到實際多邊形面積？"
-        ],
-        strategyTip: "剩餘面積 ＝ 完整大長方形面積 － 右上角直角三角形面積（先求完整，再扣空白）。",
-        question: "請觀察左圖標示的尺寸，算算看右上角切除直角三角形後，剩餘圖形的面積是多少平方公分？",
-        unit: "平方公分",
-        expectedAnswer: 122,
-        svg: (step) => `
-          <svg viewBox="0 0 280 150" class="w-full h-full max-h-64 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            ${SVG_GRID_DEFS}
-            <rect x="0" y="0" width="280" height="150" fill="url(#grid)" />
-            <g>
-              <polygon points="40,20 120,20 180,80 180,120 40,120" fill="rgba(148, 168, 154, 0.35)" stroke="#4B5F69" stroke-width="2.5" />
-              <text x="100" y="75" font-size="13" fill="#4B5F69" font-weight="bold" text-anchor="middle">剩餘圖形</text>
-              
-              ${step === 1 ? `
-                <polygon points="120,20 180,20 180,80" fill="rgba(200, 122, 122, 0.25)" stroke="#C87A7A" stroke-width="2" stroke-dasharray="4" />
-                <rect x="172" y="20" width="8" height="8" fill="none" stroke="#C87A7A" stroke-width="1" />
-                <text x="155" y="45" font-size="10" fill="#C87A7A" font-weight="bold" text-anchor="middle">空白直角三角</text>
-                <text x="155" y="58" font-size="9" fill="#C87A7A" font-weight="bold" text-anchor="middle">(6×6÷2)</text>
-                <rect x="40" y="20" width="140" height="100" fill="none" stroke="#2C3539" stroke-width="1.5" stroke-dasharray="2" />
-              ` : ''}
-              
-              <text x="32" y="74" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="end">寬 10 cm</text>
-              <text x="110" y="14" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">長 14 cm</text>
-              <text x="188" y="104" font-size="11" fill="#4B5F69" font-weight="bold">4 cm</text>
-              <text x="80" y="14" font-size="10" fill="#7E909A" text-anchor="middle">8 cm</text>
-              <text x="150" y="14" font-size="10" fill="#C87A7A" font-weight="bold" text-anchor="middle">切除 6 cm</text>
-            </g>
-          </svg>
-        `
-      }
-    ]
+  {
+    id: 2,
+    title: "題目 2：房屋型組合圖形",
+    image: "composite_shape/複合圖形2-切割合併2種解法.jpg",
+    question: "請觀察左圖標示的尺寸，算算看這個房屋形複合圖形的總面積是多少平方公分？",
+    unit: "平方公分",
+    expectedAnswer: 940,
+    idea1: {
+      name: "想法一：水平分割成「上部屋頂三角形」與「下部長方形」",
+      desc: "沿屋簷水平線切開，拆解成「屋頂三角形」與「下部長方形」兩部分分別計算後相加。",
+      guidingQuestions: [
+        "觀察下部長方形，它的長和寬分別是多少公分？長方形面積該怎麼算？",
+        "圖形總高為 31 公分、長方形高為 16 公分，上部屋頂三角形的高該如何計算？",
+        "屋頂三角形的底邊是多少？算完三角形與長方形面積後，總面積是多少？"
+      ],
+      stepsHint: "【先算】下部長方形面積 ＝ 40 × 16 ＝ 640；【再算】上部屋頂三角形高 ＝ 31 － 16 ＝ 15，面積 ＝ 40 × 15 ÷ 2 ＝ 300；【最後算】總面積 ＝ 640 ＋ 300 ＝ 940 平方公分。"
+    },
+    idea2: {
+      name: "想法二：垂直分割成左右兩個全等梯形",
+      desc: "垂直分割成左右兩個全等梯形，算出其中一個的面積後，再乘以 2 倍。",
+      guidingQuestions: [
+        "沿中間垂直線切開後，是否將這個房屋複合圖切分成兩個全等的梯形？",
+        "找得到梯形的上底、下底和高嗎？",
+        "需要應用梯形面積除以 2 再乘以 2 倍嗎？"
+      ],
+      stepsHint: "【先算】單一梯形上底 16、下底 31、高 20；【再算】單一梯形面積 ＝ (16 ＋ 31) × 20 ÷ 2 ＝ 47 × 10 ＝ 470；【最後算】總面積 ＝ 470 × 2 ＝ 940 平方公分（或直接 (16 ＋ 31) × 20 ＝ 940）。"
+    }
   },
-  translate: {
-    name: "心法三：平移再合併",
-    subtitle: "巧妙滑移・無縫拼合",
-    desc: "在草地或土地中貫穿等寬的斜路或道路時，計算剩餘土地面積的最佳方法是將被分開的圖形「向內平移合併」，消除路徑寬度！",
-    problems: [
-      {
-        title: "範例一：平行四邊形土地夾斜道",
-        idea1: "向內平移合併：消除小路寬度，拼成新底長（原底長扣除路寬）的單一平行四邊形！",
-        idea2: "總面積扣除小路：用大平行四邊形面積 (15×8) 扣除平行四邊形小路面積 (3×8)。",
-        toggleBtnText0: "✨ 執行平移並合併",
-        toggleBtnText1: "🔄 復原原本圖形",
-        helperTip: "💡 點選右上角<strong>「執行平移並合併」</strong>，觀察草地乙向左平移消除小路、無縫拼合成完整平行四邊形的動態過程！",
-        guidingQuestions: [
-          "草地被一條底寬 3 公尺的斜向小路切開，若把小路抽走、將右邊草地往左推平移靠攏，會拼成什麼形狀？",
-          "向左平移消除小路後，合併後的草地底邊長度變成了多少公尺？高度有沒有改變？",
-          "直接用「合併後的底邊」乘上「垂直高」，是否能比一塊一塊算再相加更快速？"
-        ],
-        strategyTip: "合併後底邊 ＝ 原總底長 － 小路寬度；草地總面積 ＝ 合併後底長 × 垂直高。",
-        question: "請觀察左圖標示的尺寸，花園中間有一條底寬 3 公尺的斜道，扣除道路後，草地的總面積是多少平方公尺？",
-        unit: "平方公尺",
-        expectedAnswer: 96,
-        svg: (step) => `
-          <svg viewBox="0 0 280 150" class="w-full h-full max-h-64 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            ${SVG_GRID_DEFS}
-            <rect x="0" y="0" width="280" height="150" fill="url(#grid)" />
-            <g>
-              <!-- 草地甲 (固定左側，底長 5m = 50px) -->
-              <polygon points="30,120 80,120 110,40 60,40" fill="rgba(109, 130, 116, 0.4)" stroke="#4E6151" stroke-width="2" />
-              <text x="65" y="85" font-size="12" fill="#4E6151" font-weight="bold" text-anchor="middle">草地甲</text>
-              
-              <!-- 中間小路 (路寬 3m = 30px)，平移合併時淡出消失 -->
-              ${step === 0 ? `
-                <polygon points="80,120 110,120 140,40 110,40" fill="rgba(200, 122, 122, 0.25)" stroke="#C87A7A" stroke-width="1.5" stroke-dasharray="3" />
-                <text x="110" y="85" font-size="10" fill="#C87A7A" font-weight="bold" text-anchor="middle">小路 3m</text>
-              ` : ''}
-              
-              <!-- 草地乙 (右側，step 1 時平移 dx = -30px 靠齊草地甲) -->
-              ${step === 0 ? `
-                <polygon points="110,120 180,120 210,40 140,40" fill="rgba(109, 130, 116, 0.4)" stroke="#4E6151" stroke-width="2" />
-                <text x="160" y="85" font-size="12" fill="#4E6151" font-weight="bold" text-anchor="middle">草地乙</text>
-              ` : `
-                <polygon points="80,120 150,120 180,40 110,40" fill="rgba(109, 130, 116, 0.55)" stroke="#2D4133" stroke-width="2.5" class="transition-all duration-500" />
-                <text x="130" y="85" font-size="12" fill="#2D4133" font-weight="bold" text-anchor="middle">草地乙 (已靠攏)</text>
-              `}
-              
-              <!-- 高度標示 (h = 8m = 80px) -->
-              <line x1="225" y1="40" x2="225" y2="120" stroke="#C87A7A" stroke-width="1.5" stroke-dasharray="3" />
-              <line x1="218" y1="40" x2="232" y2="40" stroke="#C87A7A" stroke-width="1" />
-              <line x1="218" y1="120" x2="232" y2="120" stroke="#C87A7A" stroke-width="1" />
-              <text x="238" y="84" font-size="11" fill="#C87A7A" font-weight="bold">高 8 m</text>
-              
-              <!-- 底部標示 -->
-              ${step === 0 ? `
-                <line x1="30" y1="132" x2="180" y2="132" stroke="#4B5F69" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
-                <text x="105" y="145" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">原總底長 15 m</text>
-              ` : `
-                <line x1="30" y1="132" x2="150" y2="132" stroke="#2D4133" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)" />
-                <text x="90" y="145" font-size="11" fill="#2D4133" font-weight="bold" text-anchor="middle">合併底長 12 m (15－3)</text>
-              `}
-            </g>
-          </svg>
-        `
-      },
-      {
-        title: "範例二：長方形草地十字步道平移",
-        idea1: "四向平移合併：四塊草地同時向內靠攏，消除十字路寬，直接重組成一個完整長方形！",
-        idea2: "面積扣除思考：若用大面積扣除兩條道路，路心重疊處會多扣一次需加回，極易算錯！",
-        toggleBtnText0: "✨ 執行四向平移合併",
-        toggleBtnText1: "🔄 復原原本圖形",
-        helperTip: "💡 點選右上角<strong>「執行四向平移合併」</strong>，觀察四塊綠地同時向內緊靠，無縫化為一個完整長方形的震撼過程！",
-        guidingQuestions: [
-          "點選右上角「執行四向平移合併」，觀察四塊草坪同時向內推擠靠攏，會重新組合成什麼圖形？",
-          "縱向與橫向步道寬度都是 2 公尺，合併後的長方形「新長度」與「新寬度」分別是多少公尺？",
-          "將合併後的新長度與新寬度相乘，是否就能輕鬆算出所有草地的總面積？"
-        ],
-        strategyTip: "合併後淨長 ＝ 總長 － 縱向路寬；合併後淨寬 ＝ 總寬 － 橫向路寬；草地總面積 ＝ 淨長 × 淨寬。",
-        question: "請觀察左圖標示的尺寸，花園中間有互相垂直、寬度皆為 2 公尺的十字步道，扣除步道後，四塊草地的總面積是多少平方公尺？",
-        unit: "平方公尺",
-        expectedAnswer: 352,
-        svg: (step) => `
-          <svg viewBox="0 0 280 150" class="w-full h-full max-h-64 overflow-visible" xmlns="http://www.w3.org/2000/svg">
-            ${SVG_GRID_DEFS}
-            <rect x="0" y="0" width="280" height="150" fill="url(#grid)" />
-            <g>
-              ${step === 0 ? `
-                <!-- 四塊分散草坪 -->
-                <rect x="30" y="30" width="70" height="40" fill="rgba(109, 130, 116, 0.4)" stroke="#4E6151" stroke-width="1.5" />
-                <rect x="120" y="30" width="70" height="40" fill="rgba(109, 130, 116, 0.4)" stroke="#4E6151" stroke-width="1.5" />
-                <rect x="30" y="80" width="70" height="40" fill="rgba(109, 130, 116, 0.4)" stroke="#4E6151" stroke-width="1.5" />
-                <rect x="120" y="80" width="70" height="40" fill="rgba(109, 130, 116, 0.4)" stroke="#4E6151" stroke-width="1.5" />
-                <!-- 十字道路虛線區 -->
-                <rect x="100" y="30" width="20" height="90" fill="rgba(200, 122, 122, 0.2)" stroke="#C87A7A" stroke-dasharray="2" />
-                <rect x="30" y="70" width="160" height="10" fill="rgba(200, 122, 122, 0.2)" stroke="#C87A7A" stroke-dasharray="2" />
-                <text x="110" y="24" font-size="9" fill="#C87A7A" font-weight="bold" text-anchor="middle">路寬 2m</text>
-                <text x="22" y="78" font-size="9" fill="#C87A7A" font-weight="bold" text-anchor="end">寬 2m</text>
-              ` : `
-                <!-- 平移合併後的單一大長方形 (寬 140px = 22m, 高 80px = 16m) -->
-                <rect x="40" y="35" width="140" height="80" fill="rgba(109, 130, 116, 0.55)" stroke="#2D4133" stroke-width="2.5" class="transition-all duration-500" />
-                <text x="110" y="75" font-size="13" fill="#2D4133" font-weight="bold" text-anchor="middle">平移合併大草坪</text>
-                <text x="110" y="93" font-size="11" fill="#2D4133" font-weight="bold" text-anchor="middle">(22 m × 16 m)</text>
-              `}
-              
-              <!-- 尺寸標示 -->
-              ${step === 0 ? `
-                <text x="110" y="14" font-size="11" fill="#4B5F69" font-weight="bold" text-anchor="middle">長 24 m</text>
-                <text x="200" y="78" font-size="11" fill="#4B5F69" font-weight="bold">寬 18 m</text>
-              ` : `
-                <text x="110" y="24" font-size="11" fill="#2D4133" font-weight="bold" text-anchor="middle">淨長 22 m (24－2)</text>
-                <text x="190" y="78" font-size="11" fill="#2D4133" font-weight="bold">淨寬 16 m (18－2)</text>
-              `}
-            </g>
-          </svg>
-        `
-      }
-    ]
+  {
+    id: 3,
+    title: "題目 3：凹多邊形與雙三角形",
+    image: "composite_shape/複合圖形3-切割合併或大減小2種解法.jpg",
+    question: "請觀察左圖標示的尺寸，算算看上方灰色塗色圖形的總面積是多少平方公尺？",
+    unit: "平方公尺",
+    expectedAnswer: 375,
+    idea1: {
+      name: "想法一：大減小（大三角形面積 － 下方空白三角形面積）",
+      desc: "利用反向思考，先計算整個大三角形的外圍面積，再扣除下方沒有塗色的空白小三角形。",
+      guidingQuestions: [
+        "外圍整個大三角形的底長（30＋20）是多少？總高（10＋15）是多少？",
+        "下方留白的小三角形，底長是多少？它的高是多少？",
+        "用大三角形面積減去空白小三角形面積，就能得到塗色區域嗎？"
+      ],
+      stepsHint: "【先算】整個大三角形面積 ＝ (30 ＋ 20) × (10 ＋ 15) ÷ 2 ＝ 50 × 25 ÷ 2 ＝ 625；【再算】下方空白三角形面積 ＝ 50 × 10 ÷ 2 ＝ 250；【最後算】塗色面積 ＝ 625 － 250 ＝ 375 平方公尺。"
+    },
+    idea2: {
+      name: "想法二：左右鉛直分割加總（左側鈍角三角形 ＋ 右側鈍角三角形）",
+      desc: "沿中間垂直高（15）作為共用底邊，將塗色部分拆成左、右兩個鈍角三角形分別計算後相加。",
+      guidingQuestions: [
+        "以中間垂直的高 15 作為底邊，左邊塗色三角形的高（水平距離 30）是多少？",
+        "以中間垂直的高 15 作為底邊，右邊塗色三角形的高（水平距離 20）是多少？",
+        "運用乘法分配律，把左右兩塊三角形面積相加，總面積是多少？"
+      ],
+      stepsHint: "【先算】左邊塗色三角形面積 ＝ 15 × 30 ÷ 2 ＝ 225；【再算】右邊塗色三角形面積 ＝ 15 × 20 ÷ 2 ＝ 150；【最後算】總塗色面積 ＝ 225 ＋ 150 ＝ 375 平方公尺。"
+    }
+  },
+  {
+    id: 4,
+    title: "題目 4：梯形中空塗色圖形",
+    image: "composite_shape/複合圖形4-切割合併或大減小2種解法.jpg",
+    question: "請觀察左圖標示的尺寸，算算看藍色塗色區域的總面積是多少平方公尺？",
+    unit: "平方公尺",
+    expectedAnswer: 68,
+    idea1: {
+      name: "想法一：大梯形面積扣除白色空白三角形（大減小）",
+      desc: "先算出外圍完整梯形的總面積，再扣除中間未塗色的白色直角三角形。",
+      guidingQuestions: [
+        "外圍大梯形的上底（8）、下底（12）與高（8）各是多少？大梯形面積該如何計算？",
+        "中間空白的直角三角形，它的底（3）與高（8）是多少？空白面積是多少？",
+        "算出完整大梯形後，扣除中間空白三角形，剩下的藍色面積是多少？"
+      ],
+      stepsHint: "【先算】外圍大梯形面積 ＝ (8 ＋ 12) × 8 ÷ 2 ＝ 20 × 8 ÷ 2 ＝ 80；【再算】中間空白直角三角形面積 ＝ 3 × 8 ÷ 2 ＝ 12；【最後算】藍色面積 ＝ 80 － 12 ＝ 68 平方公尺。"
+    },
+    idea2: {
+      name: "想法二：各別算藍色三角形再加總（上方藍色三角形 ＋ 下方藍色三角形）",
+      desc: "不透過大減小，而是直接將兩塊塗色的藍色三角形分別算出面積後相加。",
+      guidingQuestions: [
+        "上方倒立的藍色三角形，若以頂部上底（8）為底，它的高是多少公尺？面積該如何計算？",
+        "下方藍色三角形，若以下底扣除空白底（12 － 3 ＝ 9）為底，它的高是多少公尺？面積是多少？",
+        "將這兩個藍色三角形的面積相加，總面積是多少？是否和大減小的結果完全相同？"
+      ],
+      stepsHint: "【先算】上方藍色三角形面積 ＝ 8 × 8 ÷ 2 ＝ 32；【再算】下方藍色三角形底 ＝ 12 － 3 ＝ 9，面積 ＝ 9 × 8 ÷ 2 ＝ 36；【最後算】藍色總面積 ＝ 32 ＋ 36 ＝ 68 平方公尺。"
+    }
+  },
+  {
+    id: 5,
+    title: "題目 5：梯形土地夾平行四邊形斜道",
+    image: "composite_shape/複合圖形5-扣掉小梯或併成大梯2種解法.jpg",
+    question: "請觀察左圖標示的尺寸，黃色土地中間有一條底寬 6 公尺的平行四邊形斜道，扣除道路後，黃色土地的總面積是多少平方公尺？",
+    unit: "平方公尺",
+    expectedAnswer: 1125,
+    idea1: {
+      name: "想法一：大梯形面積扣除平行四邊形小路",
+      desc: "先算出包含小路在內的整個大梯形面積，再扣除中間貫穿的平行四邊形道路面積。",
+      guidingQuestions: [
+        "整個大梯形的上底（36）、下底（51）與垂直高（30）各是多少？大梯形面積是多少？",
+        "中間貫穿的斜小路是什麼形狀？它的底寬（6）與垂直高（30）是多少？小路面積是多少？",
+        "用大梯形面積扣除小路面積，黃色土地的總面積是多少？"
+      ],
+      stepsHint: "【先算】整個大梯形面積 ＝ (36 ＋ 51) × 30 ÷ 2 ＝ 87 × 15 ＝ 1305；【再算】平行四邊形小路面積 ＝ 6 × 30 ＝ 180；【最後算】剩餘土地面積 ＝ 1305 － 180 ＝ 1125 平方公尺。"
+    },
+    idea2: {
+      name: "想法二：平移消除小路，合併成一個新梯形",
+      desc: "將右側土地向左平移 6 公尺消除小路，直接拼成一個上底與下底各縮減 6 公尺的新梯形！",
+      guidingQuestions: [
+        "如果把斜道抽走，右邊土地向左推平移靠攏，會拼成什麼形狀？垂直高（30）有沒有改變？",
+        "消除路寬 6 公尺後，新梯形的「上底」（36－6）與「下底」（51－6）各變成多少？",
+        "直接計算這個合併後的新梯形面積，是不是又快又不容易算錯？"
+      ],
+      stepsHint: "【先算】平移後新梯形上底 ＝ 36 － 6 ＝ 30，新下底 ＝ 51 － 6 ＝ 45；【再算】合併後新梯形面積 ＝ (30 ＋ 45) × 30 ÷ 2 ＝ 75 × 15 ＝ 1125；【最後算】確認答案為 1125 平方公尺。"
+    }
+  },
+  {
+    id: 6,
+    title: "題目 6：十字道路綠地面積",
+    image: "composite_shape/複合圖形6-2種解法.jpg",
+    question: "請觀察左圖標示的尺寸，長方形公園中有兩條互相交叉、路寬皆為 5 公尺的道路，扣除道路後，綠色草地的總面積是多少平方公尺？",
+    unit: "平方公尺",
+    expectedAnswer: 375,
+    idea1: {
+      name: "想法一：四塊草地向內平移合併（消除十字路寬）",
+      desc: "將四塊分散的綠色草地同時向內緊靠，消除橫向與縱向各 5 公尺的路寬，直接拼成一個完整長方形！",
+      guidingQuestions: [
+        "若將四塊草地向中心靠攏，消除縱向 5 公尺與橫向 5 公尺的路寬，拼成的新長方形長與寬各是多少？",
+        "新長方形的長（30－5）是多少？新長方形的寬（20－5）是多少？",
+        "將新長與新寬相乘，是否就能一次算出所有草地的總面積？"
+      ],
+      stepsHint: "【先算】平移合併後草坪新長度 ＝ 30 － 5 ＝ 25 公尺；【再算】平移合併後草坪新寬度 ＝ 20 － 5 ＝ 15 公尺；【最後算】草地總面積 ＝ 25 × 15 ＝ 375 平方公尺。"
+    },
+    idea2: {
+      name: "想法二：大長方形扣除兩條道路，並加回重疊路心",
+      desc: "先算整個大公園面積，扣除橫向長方形路與斜向平行四邊形路，注意兩路交叉處被多扣了一次要加回來！",
+      guidingQuestions: [
+        "外圍大長方形面積（30×20）是多少？",
+        "橫向道路面積（30×5）與斜向道路面積（20×5）分別是多少？兩路交叉重疊的平行四邊形（5×5）是多少？",
+        "為什麼扣除兩條路後，必須把重疊部分加回一次？算出來總面積是多少？"
+      ],
+      stepsHint: "【先算】大長方形面積 ＝ 30 × 20 ＝ 600；【再算】橫向路面積 30×5＝150，斜向路 20×5＝100，中心交叉 5×5＝25；【最後算】草地總面積 ＝ 600 － 150 － 100 ＋ 25 ＝ 375 平方公尺。"
+    }
   }
-};
+];
 
 // --- 選單 5：小試身手 分級題庫 (含動態隨機生成、會考/篩選測驗真題與高階拆解應用題) ---
 
@@ -1136,14 +1006,14 @@ function generateRandomSlantTrapQuestion() {
         <rect x="90" y="82" width="8" height="8" fill="none" stroke="#C87A7A" stroke-width="1.5" />
         <text x="100" y="106" font-size="11" fill="#1d4ed8" font-weight="bold" text-anchor="middle">${b}</text>
         <text x="82" y="60" font-size="11" fill="#C87A7A" font-weight="bold" text-anchor="end">${h}</text>
-        <text x="55" y="55" font-size="10" fill="#7E909A">${s1}</text>
-        <text x="135" y="55" font-size="10" fill="#7E909A">${s2}</text>
+        <text x="60" y="55" font-size="10" fill="#7E909A">${s2}</text>
+        <text x="130" y="55" font-size="10" fill="#7E909A">${s1}</text>
       </svg>
     `,
     options: options,
     answerIndex: answerIndex,
     hint: "面積公式只需要互相垂直的「底」和「高」，旁邊兩條斜邊是混淆數據，千萬不要被騙囉！",
-    explanation: `底是 ${b} 公分，對應高是 ${h} 公分。三角形面積 ＝ 底 × 高 ÷ 2 ＝ ${b} × ${h} ÷ 2 ＝ ${correctAns} 平方公分。斜邊 ${s1} 與 ${s2} 不與底邊垂直，不能用來算面積！`
+    explanation: `底是 ${b} 公分，對應高是 ${h} 公分。三角形面積 ＝ 底 × 高 ÷ 2 ＝ ${b} × ${h} ÷ 2 ＝ ${correctAns} 平方公分。斜邊 ${s2} 與 ${s1} 不與底邊垂直，不能用來算面積！`
   };
 }
 
@@ -2065,46 +1935,67 @@ window.toggleDemoAutoPlay = function() {
   }
 };
 
-// --- 選單 4：複合圖形的面積 專屬邏輯 ---
-window.switchCompositeMethod = function(method) {
-  AppState.compositeArea.activeMethod = method;
-  AppState.compositeArea.problemIndex = 0;
-  AppState.compositeArea.step = 0;
-  AppState.compositeArea.practiceAnswer = null;
-  AppState.compositeArea.practiceFeedback = null;
-  renderContentAreaOnly();
-};
-
+// --- 選單 4：複合圖形的面積 專屬邏輯 (6道題目切換、求救、三階段輸入與驗證) ---
 window.switchCompositeProblem = function(idx) {
-  AppState.compositeArea.problemIndex = idx;
-  AppState.compositeArea.step = 0;
-  AppState.compositeArea.practiceAnswer = null;
+  AppState.compositeArea.currentProbIdx = idx;
+  AppState.compositeArea.showHelp = false;
+  AppState.compositeArea.stepInputs = {
+    first: '',
+    second: '',
+    final: ''
+  };
   AppState.compositeArea.practiceFeedback = null;
   renderContentAreaOnly();
 };
 
-window.toggleCompositeStep = function() {
-  AppState.compositeArea.step = AppState.compositeArea.step === 0 ? 1 : 0;
+window.toggleCompositeHelp = function() {
+  AppState.compositeArea.showHelp = !AppState.compositeArea.showHelp;
   renderContentAreaOnly();
+};
+
+window.updateCompositeStepInput = function(stepKey, val) {
+  if (!AppState.compositeArea.stepInputs) {
+    AppState.compositeArea.stepInputs = { first: '', second: '', final: '' };
+  }
+  AppState.compositeArea.stepInputs[stepKey] = val;
 };
 
 window.checkCompositeAnswer = function() {
-  const inputEl = document.getElementById('composite-answer-input');
-  if (!inputEl) return;
-  const val = parseFloat(inputEl.value);
-  const methodCfg = compositeAreaConfig[AppState.compositeArea.activeMethod];
-  const problemIdx = AppState.compositeArea.problemIndex || 0;
-  const prob = methodCfg.problems[problemIdx] || methodCfg.problems[0];
+  const prob = compositeProblemsData[AppState.compositeArea.currentProbIdx] || compositeProblemsData[0];
   const unit = prob.unit || '平方公分';
-  if (val === prob.expectedAnswer) {
+  const finalInputEl = document.getElementById('composite-final-input');
+  const userValStr = finalInputEl ? finalInputEl.value.trim() : (AppState.compositeArea.stepInputs.final || '');
+  
+  if (!userValStr) {
+    AppState.compositeArea.practiceFeedback = {
+      type: 'info',
+      text: '請在「最後算」填入你計算出的最終總面積數字喔！'
+    };
+    renderContentAreaOnly();
+    return;
+  }
+
+  // 支援數字直接輸入或簡單算式計算（例如 25*15 或 375）
+  let userFinalVal = parseFloat(userValStr);
+  if (isNaN(userFinalVal)) {
+    try {
+      // 安全清理後計算簡單四則運算
+      const cleanExpr = userValStr.replace(/×/g, '*').replace(/÷/g, '/').replace(/＋/g, '+').replace(/－/g, '-');
+      if (/^[0-9+\-*/().\s]+$/.test(cleanExpr)) {
+        userFinalVal = Function(`'use strict'; return (${cleanExpr})`)();
+      }
+    } catch(e) {}
+  }
+
+  if (!isNaN(userFinalVal) && Math.abs(userFinalVal - prob.expectedAnswer) < 0.1) {
     AppState.compositeArea.practiceFeedback = {
       type: 'success',
-      text: `🎉 太棒了！回答完全正確，總面積正是 ${prob.expectedAnswer} ${unit}。幾何拆解與推導非常出色！`
+      text: `🎉 太棒了！回答完全正確！這個複合圖形的總面積正是 ${prob.expectedAnswer} ${unit}。你的逐步分析與推理非常精彩！`
     };
   } else {
     AppState.compositeArea.practiceFeedback = {
       type: 'error',
-      text: `💡 再檢查看看計算喔！回想左側的思考引導，仔細檢查各部分的底、高或長、寬是否正確！`
+      text: `💡 算出的數值好像不太一樣喔！請按下方的「🆘 求救」查看幾何自主推導，再回頭檢查「先算」與「再算」的底、高與分塊面積是否正確！`
     };
   }
   renderContentAreaOnly();
@@ -3202,41 +3093,19 @@ function renderPhotoSelfCheck() {
   `;
 }
 
-// 分頁 4：複合圖形的面積 (支援題庫範例切換與底邊對齊格線)
+// 分頁 4：複合圖形的面積 (6道題目切換、先算/再算/最後算、求救多元解題想法)
 function renderCompositeArea() {
   const comp = AppState.compositeArea;
-  const activeMethodKey = comp.activeMethod;
-  const methodConfig = compositeAreaConfig[activeMethodKey];
-  const problemIdx = comp.problemIndex || 0;
-  const currentProb = methodConfig.problems[problemIdx] || methodConfig.problems[0];
+  const currentIdx = comp.currentProbIdx || 0;
+  const currentProb = compositeProblemsData[currentIdx] || compositeProblemsData[0];
+  const stepInputs = comp.stepInputs || { first: '', second: '', final: '' };
 
-  const toggleBtnText = comp.step === 0 ? currentProb.toggleBtnText0 : currentProb.toggleBtnText1;
-  const helperTip = currentProb.helperTip;
-
-  const methodTabs = [
-    { key: 'split', label: '1. 分割再加總' },
-    { key: 'subtract', label: '2. 補完再刪去' },
-    { key: 'translate', label: '3. 平移再合併' }
-  ];
-
-  const methodTabsHtml = methodTabs.map(tab => {
-    const isActive = comp.activeMethod === tab.key;
-    return `
-      <button class="px-5 py-2.5 rounded-full font-bold text-sm transition-all border
-        ${isActive ? 'bg-slate-700 text-white border-slate-700 shadow-md scale-105' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'}"
-        onclick="window.switchCompositeMethod('${tab.key}')"
-      >
-        ${tab.label}
-      </button>
-    `;
-  }).join('');
-
-  // 範例切換按鈕組
-  const problemTabsHtml = methodConfig.problems.map((prob, idx) => {
-    const isProbActive = problemIdx === idx;
+  // 6 道題目標籤列
+  const problemTabsHtml = compositeProblemsData.map((prob, idx) => {
+    const isProbActive = currentIdx === idx;
     return `
       <button class="px-4 py-2 rounded-xl text-xs font-bold transition-all border
-        ${isProbActive ? 'bg-slate-600 text-white border-slate-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}"
+        ${isProbActive ? 'bg-slate-700 text-white border-slate-700 shadow-md scale-105' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}"
         onclick="window.switchCompositeProblem(${idx})"
       >
         ${prob.title}
@@ -3244,91 +3113,164 @@ function renderCompositeArea() {
     `;
   }).join('');
 
+  // 圖片路徑解析
+  const imgSrc = window.getPadletImageSrc(currentProb.image);
+
   return `
     <div class="flex flex-col max-w-5xl mx-auto px-4 fade-in">
-      <div class="flex justify-center gap-3 mb-4 flex-wrap">
-        ${methodTabsHtml}
-      </div>
-      
-      <!-- 範例次分頁導覽 -->
+      <!-- 題目次導覽 (6 道題目切換) -->
       <div class="flex justify-center gap-2 mb-6 flex-wrap">
         ${problemTabsHtml}
       </div>
       
-      <div class="main-grid">
-        <div class="glass-panel flex flex-col justify-between" style="min-height: 450px;">
-          <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-            <div>
-              <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <span class="w-2.5 h-6 bg-slate-600 rounded-full inline-block"></span>
-                ${methodConfig.name}
-              </h2>
-              <span class="text-slate-500 text-xs font-semibold">${currentProb.title}</span>
+      <div class="main-grid" style="grid-template-columns: 1.1fr 1fr; gap: 24px;">
+        <!-- 左側：真實題目圖片、題目情境與求救引導 -->
+        <div class="glass-panel flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <span class="px-3 py-1 rounded-full font-bold text-xs bg-slate-200 text-slate-700">
+                ${currentProb.title}
+              </span>
+              <span class="text-slate-500 font-semibold text-xs">共 6 題中的第 ${currentIdx + 1} 題</span>
             </div>
-            <button class="btn btn-primary text-xs px-4 py-2 font-bold shadow-sm" onclick="window.toggleCompositeStep()">
-              ${toggleBtnText}
+            
+            <h2 class="text-base font-bold text-slate-800 mb-3 leading-relaxed">${currentProb.question}</h2>
+            
+            <!-- 題目圖片展示 -->
+            <div class="p-3 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
+              <img src="${imgSrc}" alt="${currentProb.title}" class="max-h-72 w-auto object-contain rounded-lg" />
+            </div>
+          </div>
+          
+          <!-- 求救按鈕與多元解題想法 -->
+          <div class="mt-2 border-t border-slate-200/80 pt-3">
+            <button onclick="window.toggleCompositeHelp()" class="btn ${comp.showHelp ? 'btn-outline' : 'btn-primary'} text-xs px-4 py-2 font-bold w-full flex items-center justify-center gap-1.5 shadow-sm">
+              <span>${comp.showHelp ? '🔼 收合解題想法' : '🆘 求救 (查看多元解題想法)'}</span>
             </button>
-          </div>
-          
-          <div class="svg-workspace p-6 border rounded-2xl flex-grow mb-6 relative overflow-visible bg-white">
-            ${currentProb.svg(comp.step)}
-          </div>
-          
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
-            ${helperTip}
+            
+            ${comp.showHelp ? `
+              <div class="mt-3 space-y-3 fade-in">
+                <!-- 想法一 -->
+                <div class="bg-amber-50/90 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-950 shadow-xs">
+                  <div class="flex items-center gap-2 mb-1.5">
+                    <span class="px-2 py-0.5 rounded-md bg-amber-700 text-white font-bold text-[10px]">解題想法 1</span>
+                    <span class="font-bold text-amber-900">${currentProb.idea1.name}</span>
+                  </div>
+                  <p class="text-amber-800/90 mb-2 leading-relaxed">${currentProb.idea1.desc}</p>
+                  
+                  <div class="bg-white/80 p-2.5 rounded-lg border border-amber-200/60 mb-1.5">
+                    <div class="font-bold text-amber-900 mb-1 flex items-center gap-1">
+                      <span>💡</span> 幾何提問・自主推導：
+                    </div>
+                    <ul class="space-y-1 list-disc list-inside text-amber-900/90 leading-relaxed">
+                      ${currentProb.idea1.guidingQuestions.map(q => `<li>${q}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- 想法二 -->
+                <div class="bg-emerald-50/90 border border-emerald-200 rounded-xl p-3.5 text-xs text-emerald-950 shadow-xs">
+                  <div class="flex items-center gap-2 mb-1.5">
+                    <span class="px-2 py-0.5 rounded-md bg-emerald-700 text-white font-bold text-[10px]">解題想法 2</span>
+                    <span class="font-bold text-emerald-900">${currentProb.idea2.name}</span>
+                  </div>
+                  <p class="text-emerald-800/90 mb-2 leading-relaxed">${currentProb.idea2.desc}</p>
+                  
+                  <div class="bg-white/80 p-2.5 rounded-lg border border-emerald-200/60 mb-1.5">
+                    <div class="font-bold text-emerald-900 mb-1 flex items-center gap-1">
+                      <span>💡</span> 幾何提問・自主推導：
+                    </div>
+                    <ul class="space-y-1 list-disc list-inside text-emerald-900/90 leading-relaxed">
+                      ${currentProb.idea2.guidingQuestions.map(q => `<li>${q}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
           </div>
         </div>
         
-        <div class="flex flex-col gap-6">
-          <div class="glass-panel">
-            <h3 class="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">心法思考導引</h3>
-            <p class="text-slate-700 text-sm leading-relaxed mb-4">${methodConfig.desc}</p>
-            
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
-              <div class="flex items-center gap-1.5 mb-2.5">
-                <span class="w-2 h-4 bg-slate-600 rounded-full inline-block"></span>
-                <span class="text-xs font-bold text-slate-800">多元解題想法 (幾何探究)</span>
-              </div>
-              
-              <div class="space-y-2 mb-3 bg-white p-3 rounded-lg border border-slate-200/80">
-                <div class="flex items-start gap-2 text-xs">
-                  <span class="px-1.5 py-0.5 rounded bg-slate-700 text-white font-bold text-[10px] flex-shrink-0 mt-0.5">想法一</span>
-                  <span class="text-slate-700 font-semibold leading-relaxed">${currentProb.idea1 || ''}</span>
+        <!-- 右側：三階段自主推導計算區 (先算、再算、最後算、驗證答案) -->
+        <div class="glass-panel flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-4 border-b border-slate-200/80 pb-2.5">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📐</span> 自主推導計算區
+              </h3>
+              <span class="text-xs text-slate-400 font-semibold">先算 ➔ 再算 ➔ 最後算</span>
+            </div>
+
+            <div class="space-y-4">
+              <!-- 1. 先算 -->
+              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-slate-600 text-white flex items-center justify-center text-[10px]">1</span>
+                    先算：
+                  </label>
+                  <span class="text-[11px] text-slate-400">第一部分算式或分塊面積</span>
                 </div>
-                ${currentProb.idea2 ? `
-                  <div class="flex items-start gap-2 text-xs pt-1.5 border-t border-slate-100">
-                    <span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-bold text-[10px] flex-shrink-0 mt-0.5">想法二</span>
-                    <span class="text-slate-600 font-medium leading-relaxed">${currentProb.idea2}</span>
-                  </div>
-                ` : ''}
+                <input 
+                  type="text" 
+                  id="composite-first-input" 
+                  value="${stepInputs.first || ''}" 
+                  oninput="window.updateCompositeStepInput('first', this.value)"
+                  placeholder="例如：20 × 9 ÷ 2 ＝ 90" 
+                  class="w-full px-3 py-2 bg-white border rounded-lg border-slate-300 text-slate-800 text-sm font-semibold focus:outline-none focus:border-slate-500"
+                />
               </div>
 
-              <div class="flex items-center gap-1.5 mb-2">
-                <span class="text-amber-500 text-sm">💡</span>
-                <span class="text-xs font-bold text-slate-700">幾何提問・自主推導</span>
+              <!-- 2. 再算 -->
+              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-slate-600 text-white flex items-center justify-center text-[10px]">2</span>
+                    再算：
+                  </label>
+                  <span class="text-[11px] text-slate-400">第二部分算式或空白面積</span>
+                </div>
+                <input 
+                  type="text" 
+                  id="composite-second-input" 
+                  value="${stepInputs.second || ''}" 
+                  oninput="window.updateCompositeStepInput('second', this.value)"
+                  placeholder="例如：40 × 16 ＝ 640 或空白面積" 
+                  class="w-full px-3 py-2 bg-white border rounded-lg border-slate-300 text-slate-800 text-sm font-semibold focus:outline-none focus:border-slate-500"
+                />
               </div>
-              <ul class="space-y-1.5 text-xs text-slate-700 font-medium">
-                ${(currentProb.guidingQuestions || []).map((q, qIdx) => `
-                  <li class="flex items-start gap-1.5">
-                    <span class="text-slate-400 font-bold mt-0.5">${qIdx + 1}.</span>
-                    <span class="leading-relaxed">${q}</span>
-                  </li>
-                `).join('')}
-              </ul></div>
-          </div>
-          
-          <div class="glass-panel">
-            <h3 class="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">動手算算看小挑戰</h3>
-            <p class="text-slate-700 text-sm mb-3 font-medium">${currentProb.question}</p>
-            
-            <div class="flex gap-3 mb-3">
-              <input type="number" id="composite-answer-input" placeholder="請輸入答案數字" class="flex-grow px-4 py-2 border rounded-xl border-slate-300 text-slate-800 text-sm font-bold focus:outline-none focus:border-slate-500" />
-              <button class="btn btn-primary text-sm px-5" onclick="window.checkCompositeAnswer()">驗證答案</button>
+
+              <!-- 3. 最後算 -->
+              <div class="p-3.5 bg-amber-50/50 rounded-xl border border-amber-200/80">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px]">3</span>
+                    最後算（最終面積）：
+                  </label>
+                  <span class="text-[11px] text-amber-700 font-semibold">填入最終總面積數字</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="text" 
+                    id="composite-final-input" 
+                    value="${stepInputs.final || ''}" 
+                    oninput="window.updateCompositeStepInput('final', this.value)"
+                    placeholder="請填入計算結果數字" 
+                    class="flex-grow px-3 py-2 bg-white border rounded-lg border-amber-300 text-slate-900 text-sm font-bold focus:outline-none focus:border-amber-500"
+                  />
+                  <span class="text-xs font-bold text-slate-600 whitespace-nowrap">${currentProb.unit || '平方公分'}</span>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div class="mt-4">
+            <button class="btn btn-primary w-full py-2.5 text-sm font-bold shadow-md" onclick="window.checkCompositeAnswer()">
+              ✨ 驗證答案
+            </button>
             
             ${comp.practiceFeedback ? `
-              <div class="p-3 rounded-xl border text-xs font-bold fade-in
-                ${comp.practiceFeedback.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-rose-50 border-rose-300 text-rose-800'}">
+              <div class="p-3.5 rounded-xl border text-xs font-bold mt-3 fade-in leading-relaxed
+                ${comp.practiceFeedback.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : comp.practiceFeedback.type === 'info' ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-rose-50 border-rose-300 text-rose-800'}">
                 ${comp.practiceFeedback.text}
               </div>
             ` : ''}
@@ -3492,7 +3434,20 @@ function renderChallenge() {
 
   // 測驗結束畫面
   if (qState.isFinished) {
-    const isPass = qState.score >= 75;
+    const isPass = qState.score > 60;
+    let feedbackText = '';
+    if (isPass) {
+      feedbackText = '你對這個單元的概念大致精熟。';
+    } else {
+      if (currentLvl === 'basic') {
+        feedbackText = '已努力嘗試！可到「公式探索」學習後，再回來挑戰一次！';
+      } else if (currentLvl === 'intermediate') {
+        feedbackText = '已努力嘗試！可到「公式探索」或「為圖形量身高」學習後，再回來挑戰一次！';
+      } else {
+        feedbackText = '已努力嘗試！可到「公式探索」或「複合圖形面積」學習後，再回來挑戰一次！';
+      }
+    }
+
     return `
       <div class="fade-in">
         ${levelTabsHtml}
@@ -3501,8 +3456,8 @@ function renderChallenge() {
             ${isPass ? '🏆' : '💪'}
           </div>
           <h2 class="text-3xl font-black text-slate-800 mb-2">挑戰完成！</h2>
-          <p class="text-slate-500 font-semibold mb-6">
-            ${isPass ? '太厲害了！你對這個單元的概念非常清晰精熟！' : '很棒的嘗試！可複習公式推導或複合圖形拆解，再回來挑戰一次！'}
+          <p class="text-slate-600 font-bold text-base mb-6 px-4">
+            ${feedbackText}
           </p>
           
           <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8 max-w-xs mx-auto">
