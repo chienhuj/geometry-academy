@@ -652,57 +652,57 @@ const compositeProblemsData = [
   {
     id: 1,
     title: "題目 1：切割合併多邊形",
-    image: "composite_shape/複合圖形1-切割合併2種解法.jpg",
-    question: "請觀察左圖標示的邊長與垂直符號，算算看複合圖形 ACDE 的總面積是多少平方公分？",
+    image: "composite_shape/複合圖形1-切割合併2種解法n.jpg",
+    question: "請觀察左圖標示的邊長與垂直符號，算算看複合圖形的總面積是多少平方公分？",
     unit: "平方公分",
-    expectedAnswer: 297,
+    expectedAnswer: 261,
     idea1: {
-      name: "想法一：沿水平線 BE 切割成三角形與梯形",
-      desc: "沿水平線 BE 切割，將圖形拆解成上方直角三角形 △ABE 與下方直角梯形 BCDE 分別計算。",
+      name: "想法一：沿水平線切割成三角形與梯形",
+      desc: "沿中間水平虛線（長 18）切割，將圖形拆解成上方直角三角形與下方直角梯形分別計算。",
       guidingQuestions: [
-        "沿水平線 BE 切割成三角形 △ABE 後，底邊長是多少？對應的高是多少？面積該如何計算？",
-        "沿水平線 BE 切割成梯形 BCDE 後，能找到它的上底、下底和高嗎？面積該如何計算？",
+        "沿中間水平虛線切割成上方三角形後，底邊長是多少？對應的高是多少？面積該如何計算？",
+        "沿水平虛線切割成下方梯形後，能找到它的上底（18）、下底（18＋4＝22）和高（9）嗎？面積該如何計算？",
         "分別算出兩個圖形的面積後，相加的總面積是多少？"
       ],
-      stepsHint: "【先算】三角形 △ABE 面積 ＝ 20 × 9 ÷ 2 ＝ 90；【再算】梯形 BCDE 面積 ＝ (20 ＋ 26) × 9 ÷ 2 ＝ 46 × 9 ÷ 2 ＝ 207；【最後算】總面積 ＝ 90 ＋ 207 ＝ 297 平方公分。"
+      stepsHint: "【上方直角三角形】18 × 9 ÷ 2 ＝ 81\n【下方直角梯形】\n・總底：18 ＋ 4 ＝ 22\n・面積：(18 ＋ 22) × 9 ÷ 2 ＝ 180\n【總面積】81 ＋ 180 ＝ 261 平方公分"
     },
     idea2: {
-      name: "想法二：沿斜線 EC 切割成兩個三角形",
-      desc: "沿線段 EC 切割，將圖形拆成左上方鈍角三角形 △ACE 與右下方三角形 △ECD。",
+      name: "想法二：沿斜線切割成兩個三角形",
+      desc: "沿斜虛線切割，將圖形拆成左上方鈍角三角形與右下方三角形分別計算。",
       guidingQuestions: [
-        "沿線段 EC 切割後，左上方三角形 △ACE 如果以邊長 AC（9＋9＝18）為底，它的高是多少公分？",
-        "沿線段 EC 切割後，右下方三角形 △ECD，如果以底邊 CD（20＋6＝26）為底，對應的高是多少？",
+        "沿斜虛線切割後，左上方三角形如果以左側垂直邊（9＋9＝18）為底，它的高是多少公分？",
+        "沿斜虛線切割後，右下方三角形如果以底部總長（18＋4＝22）為底，對應的高是多少？",
         "分別算出兩塊三角形面積後，相加的總面積是多少？"
       ],
-      stepsHint: "【先算】三角形 △ACE 面積 ＝ 18 × 20 ÷ 2 ＝ 180；【再算】三角形 △ECD 面積 ＝ (20 ＋ 6) × 9 ÷ 2 ＝ 26 × 9 ÷ 2 ＝ 117；【最後算】總面積 ＝ 180 ＋ 117 ＝ 297 平方公分。"
+      stepsHint: "【左上方鈍角三角形】(以高 18 為底)\n(9 ＋ 9) × 18 ÷ 2 ＝ 162\n【右下方三角形】\n・總底：18 ＋ 4 ＝ 22\n・面積：22 × 9 ÷ 2 ＝ 99\n【總面積】162 ＋ 99 ＝ 261 平方公分"
     }
   },
   {
     id: 2,
     title: "題目 2：房屋型組合圖形",
-    image: "composite_shape/複合圖形2-切割合併2種解法.jpg",
+    image: "composite_shape/複合圖形2-切割合併2種解法n.jpg",
     question: "請觀察左圖標示的尺寸，算算看這個房屋形複合圖形的總面積是多少平方公分？",
     unit: "平方公分",
     expectedAnswer: 940,
     idea1: {
       name: "想法一：水平分割成「上部屋頂三角形」與「下部長方形」",
-      desc: "沿屋簷水平線切開，拆解成「屋頂三角形」與「下部長方形」兩部分分別計算後相加。",
+      desc: "沿屋簷水平線切開，拆解成「上部屋頂三角形」與「下部長方形」兩部分分別計算後相加。",
       guidingQuestions: [
-        "觀察下部長方形，它的長和寬分別是多少公分？長方形面積該怎麼算？",
-        "圖形總高為 31 公分、長方形高為 16 公分，上部屋頂三角形的高該如何計算？",
+        "觀察下部長方形，它的長（40 cm）和寬（15 cm）分別是多少？長方形面積該怎麼算？",
+        "圖形總高為 32 cm、下部長方形高為 15 cm，上部屋頂三角形的高該如何推算？",
         "屋頂三角形的底邊是多少？算完三角形與長方形面積後，總面積是多少？"
       ],
-      stepsHint: "【先算】下部長方形面積 ＝ 40 × 16 ＝ 640；【再算】上部屋頂三角形高 ＝ 31 － 16 ＝ 15，面積 ＝ 40 × 15 ÷ 2 ＝ 300；【最後算】總面積 ＝ 640 ＋ 300 ＝ 940 平方公分。"
+      stepsHint: "【先算】下部長方形面積 ＝ 40 × 15 ＝ 600；【再算】上部屋頂三角形高 ＝ 32 － 15 ＝ 17，面積 ＝ 40 × 17 ÷ 2 ＝ 340；【最後算】總面積 ＝ 600 ＋ 340 ＝ 940 平方公分。"
     },
     idea2: {
       name: "想法二：垂直分割成左右兩個全等梯形",
       desc: "垂直分割成左右兩個全等梯形，算出其中一個的面積後，再乘以 2 倍。",
       guidingQuestions: [
-        "沿中間垂直線切開後，是否將這個房屋複合圖切分成兩個全等的梯形？",
-        "找得到梯形的上底、下底和高嗎？",
-        "需要應用梯形面積除以 2 再乘以 2 倍嗎？"
+        "沿中間垂直線切開後，是否將這個房屋複合圖切分成左右兩個全等的梯形？",
+        "能找到每個梯形的上底（15 cm）、下底（32 cm）和高（20 cm）嗎？",
+        "需要應用梯形面積除以 2 再乘以 2 倍嗎？是否可以直接算？"
       ],
-      stepsHint: "【先算】單一梯形上底 16、下底 31、高 20；【再算】單一梯形面積 ＝ (16 ＋ 31) × 20 ÷ 2 ＝ 47 × 10 ＝ 470；【最後算】總面積 ＝ 470 × 2 ＝ 940 平方公分（或直接 (16 ＋ 31) × 20 ＝ 940）。"
+      stepsHint: "【先算】單一梯形上底 15、下底 32、高 20；【再算】單一梯形面積 ＝ (15 ＋ 32) × 20 ÷ 2 ＝ 47 × 10 ＝ 470；【最後算】總面積 ＝ 470 × 2 ＝ 940 平方公分（或直接 (15 ＋ 32) × 20 ＝ 940）。"
     }
   },
   {
@@ -3158,7 +3158,7 @@ function renderCompositeArea() {
                   </div>
                   <p class="text-amber-800/90 mb-2 leading-relaxed">${currentProb.idea1.desc}</p>
                   
-                  <div class="bg-white/80 p-2.5 rounded-lg border border-amber-200/60 mb-1.5">
+                  <div class="bg-white/80 p-2.5 rounded-lg border border-amber-200/60 mb-2">
                     <div class="font-bold text-amber-900 mb-1 flex items-center gap-1">
                       <span>💡</span> 幾何提問・自主推導：
                     </div>
@@ -3166,6 +3166,14 @@ function renderCompositeArea() {
                       ${currentProb.idea1.guidingQuestions.map(q => `<li>${q}</li>`).join('')}
                     </ul>
                   </div>
+                  ${currentProb.idea1.stepsHint ? `
+                    <div class="bg-amber-100/70 p-2.5 rounded-lg border border-amber-300/70 text-amber-950 font-medium leading-relaxed">
+                      <div class="font-bold text-amber-900 mb-1 flex items-center gap-1">
+                        <span>📝</span> 算式思考步驟：
+                      </div>
+                      <div class="whitespace-pre-line text-[11px]">${currentProb.idea1.stepsHint}</div>
+                    </div>
+                  ` : ''}
                 </div>
 
                 <!-- 想法二 -->
@@ -3176,7 +3184,7 @@ function renderCompositeArea() {
                   </div>
                   <p class="text-emerald-800/90 mb-2 leading-relaxed">${currentProb.idea2.desc}</p>
                   
-                  <div class="bg-white/80 p-2.5 rounded-lg border border-emerald-200/60 mb-1.5">
+                  <div class="bg-white/80 p-2.5 rounded-lg border border-emerald-200/60 mb-2">
                     <div class="font-bold text-emerald-900 mb-1 flex items-center gap-1">
                       <span>💡</span> 幾何提問・自主推導：
                     </div>
@@ -3184,6 +3192,14 @@ function renderCompositeArea() {
                       ${currentProb.idea2.guidingQuestions.map(q => `<li>${q}</li>`).join('')}
                     </ul>
                   </div>
+                  ${currentProb.idea2.stepsHint ? `
+                    <div class="bg-emerald-100/70 p-2.5 rounded-lg border border-emerald-300/70 text-emerald-950 font-medium leading-relaxed">
+                      <div class="font-bold text-emerald-900 mb-1 flex items-center gap-1">
+                        <span>📝</span> 算式思考步驟：
+                      </div>
+                      <div class="whitespace-pre-line text-[11px]">${currentProb.idea2.stepsHint}</div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
